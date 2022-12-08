@@ -1,34 +1,6 @@
 <template>
-  <div>
     <div class="row">
-      <!-- <div class="col-3">
-        <h3>Draggable 1</h3>
-        <vuedraggable class="dragArea list-group" :list="list1" :group="{ name: 'people', pull: 'clone', put: false }"
-          :clone="cloneDog" @change="log" item-key="id" style="background-color: aliceblue;">
-          <template #item="{ element }">
-            <div class="list-group-item">
-              {{ element.name }}
-            </div>
-          </template>
-        </vuedraggable>
-      </div> -->
-
-      <!-- <div class="col-3" v-if="true">
-        <h3>Draggable 2</h3> 
-        <draggable class="dragArea list-group" :list="list2" group="people" @change="log" item-key="id"
-          style="background-color: aquamarine; min-height: 200px">
-          <template #item="{ element }">
-            <div class="list-group-item">
-              {{ element }}
-              <component v-bind:is="element.type" :ref="element.ref" @click="clicked(element)"
-                v-model="cps[element.ref].modelValue" v-bind="cps[element.ref]" />
-            </div>
-          </template>
-        </draggable>
-      </div> -->
-
       <div class="col-12" v-if="true" style="height: 100%">
-        <!-- <h3>Draggable 2</h3> -->
         <div class="layoutJSON">
           Displayed as <code>[x, y, w, h]</code>:
           <div class="columns">
@@ -61,84 +33,9 @@
           </grid-item>
         </grid-layout>
       </div>
-
-      <!-- <div class="col-3" v-if="false">
-        <q-list dense bordered separator>
-          <q-item clickable v-ripple v-for="item in list3" :key="item.id">
-            <q-item-section>
-              {{ item[0] }} : {{ typeof (item[1]) }} : {{ item[1] }}
-              <template v-if="typeof (item[1]) === 'boolean'">
-                <q-toggle v-model="cps[selected_cp.ref][item[0]]" dense />
-              </template>
-              <template v-else-if="typeof (item[1]) === 'string'">
-                <template v-if="['color', 'bgColor', 'labelColor'].includes(item[0])">
-                  <q-select filled v-model="cps[selected_cp.ref][item[0]]" :options="options" dense options-dense
-                    emit-value>
-                    <template v-slot:option="scope">
-                      <q-item v-bind="scope.itemProps">
-                        <q-item-section avatar>
-                          <q-icon name="square" :color="scope.opt.value" />
-                        </q-item-section>
-                        <q-item-section>
-                          <q-item-label>{{ scope.opt.label }}</q-item-label>
-                          <q-item-label caption>{{ scope.opt.description }}</q-item-label>
-                        </q-item-section>
-                      </q-item>
-                    </template>
-                  </q-select>
-                </template>
-                <template v-else>
-                  <q-input v-model="cps[selected_cp.ref][item[0]]" dense borderless />
-                </template>
-              </template>
-              <template v-else>
-              </template>
-            </q-item-section>
-          </q-item>
-        </q-list>
-        <draggable class="dragArea list-group" :list="list3" group="people" @change="log" item-key="id"
-          style="background-color: aquamarine;" v-if="false">
-          <template #item="{ element }">
-            <div class="list-group-item">
-              {{ element[0] }} : {{ typeof (element[1]) }} : {{ element[1] }}
-              <template v-if="typeof (element[1]) === 'boolean'">
-                <q-toggle v-model="cps[selected_cp.ref][element[0]]" dense />
-              </template>
-              <template v-else-if="typeof (element[1]) === 'string'">
-                <template v-if="['color', 'bgColor', 'labelColor'].includes(element[0])">
-                  <q-select filled v-model="cps[selected_cp.ref][element[0]]" :options="options" dense options-dense
-                    emit-value>
-                    <template v-slot:option="scope">
-                      <q-item v-bind="scope.itemProps">
-                        <q-item-section avatar>
-                          <q-icon name="square" :color="scope.opt.value" />
-                        </q-item-section>
-                        <q-item-section>
-                          <q-item-label>{{ scope.opt.label }}</q-item-label>
-                          <q-item-label caption>{{ scope.opt.description }}</q-item-label>
-                        </q-item-section>
-                      </q-item>
-                    </template>
-                  </q-select>
-                </template>
-                <template v-else>
-                  <q-input v-model="cps[selected_cp.ref][element[0]]" dense />
-                </template>
-              </template>
-              <template v-else>
-              </template>
-            </div>
-          </template>
-        </draggable>
-      </div> -->
-
-      <!-- <rawDisplayer class="col-3" :value="list1" title="List 1" />
-
-    <rawDisplayer class="col-3" :value="list2" title="List 2" /> -->
     </div>
-
-  </div>
 </template>
+
 <script setup>
 import { ref } from 'vue';
 import { GridLayout, GridItem } from 'vue3-grid-layout'
@@ -153,56 +50,9 @@ const draggable = true
 const resizable = true
 const colNum = 512
 let index = 0
-// const list1 = [
-//   { name: 'QInput', id: 1, type: 'q-input', ref: 'qInput' },
-//   { name: 'QBtn', id: 2, type: 'q-btn', ref: 'qBtn' },
-//   { name: 'QSelect', id: 3, type: 'q-select', ref: 'qSelect' },
-//   { name: 'QRadio', id: 4, type: 'q-radio', ref: 'qRadio' },
-//   { name: 'QSlider', id: 5, type: 'q-slider', ref: 'qSlider' },
-// ]
-// const list2 = [
-//   // { name: 'cat 5', id: 5 },
-//   // { name: 'cat 6', id: 6 },
-//   // { name: 'cat 7', id: 7 }
-// ]
-// const txt = ''
 const list3 = ref([])
-// vmdl3: {}
-// const objs = {
-//   label: '',
-//   outlined: false
-// }
 const cps = store.cps
-// const selected_ref = ''
 const selected_cp = ref({})
-// const model = null
-// const options = [
-//   {
-//     label: 'red',
-//     value: 'red',
-//     description: 'red',
-//   },
-//   {
-//     label: 'pink',
-//     value: 'pink',
-//     description: 'pink',
-//   },
-//   {
-//     label: 'purple',
-//     value: 'purple',
-//     description: 'purple',
-//   },
-//   {
-//     label: 'deep-purple',
-//     value: 'deep-purple',
-//     description: 'deep-purple',
-//   },
-//   {
-//     label: 'indigo',
-//     value: 'indigo',
-//     description: 'indigo',
-//   },
-// ]
 
 const elements = ref({})
 const gridItems = ref({})
@@ -213,14 +63,13 @@ const addItem = function () {
   // Add a new item. It must have a u nique key!
   layout.value.push({
     x: (layout.value.length * 1) % (colNum || 2),
-    // y: this.layout.length + (this.colNum || 12), // puts it at the bottom
-    y: 0,
+    y: layout.value.length + (colNum || 12), // puts it at the bottom
+    // y: 0,
     w: 100,
     h: 50,
     i: index,
     list: ref([])
   });
-  // Increment the counter to ensure key is always unique.
   index = index + 1
   console.log(layout.value)
 }
@@ -229,11 +78,6 @@ const clicked = function (element) {
   console.log('clicked')
   console.log(element)
   console.log(elements.value)
-  // console.log(this.$refs)
-  // // this.vmdl3 = JSON.parse(JSON.stringify(this.$refs[element.ref]));
-  // this.vmdl3 = Object.assign({}, this.$refs[element.ref][0]);
-  // console.log(this.$refs[element.ref][0])
-  // selected_ref = element.ref
   list3.value = Object.entries(elements.value[element.ref])
   store.list3 = Object.entries(elements.value[element.ref])
   selected_cp.value = element

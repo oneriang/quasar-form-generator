@@ -1,91 +1,52 @@
 <template>
+  <q-splitter v-model="splitterModel" style="height: 100%">
+    <template v-slot:before>
+      <div class="q-pa-md">
+        <q-tabs v-model="tab" align="justify" dense narrow-indicator>
+          <q-tab name="add" label="Add Field" />
+          <q-tab name="edit" label="Edit Field" :disable="!currentField" />
+        </q-tabs>
+        <q-tab-panels v-model="tab" animated>
+          <q-tab-panel name="add">
+            <draggable item-key="id" v-model="sourceFields" :clone="createField" :options="sourceOptions" :sort="false" :group="{ name: 'elements', pull: 'clone', put: false }">
+              <template #item="{ element }">
+                <div class="source-field">
+                  <q-btn type="button" size="12px" dense align="left" class="btn-fixed-width"
+                    @click="onAddFieldClick(element.type)" :icon="element.icon" :label="element.label"
+                    v-if="element.type !== ''" />
+                </div>
+              </template>
+            </draggable>
+          </q-tab-panel>
+          <q-tab-panel name="edit">
+            <editable-element-options :vmValue="currentField" :type-info="sourceFields" />
+          </q-tab-panel>
+        </q-tab-panels>
+      </div>
+    </template>
 
-  <div style="width:100%;height:100%">
-
-    <q-tabs v-model="tab" align="justify" dense narrow-indicator>
-      <q-tab name="add" label="Add Field" />
-      <q-tab name="edit" label="Edit Field" :disable="!currentField" />
-    </q-tabs>
-    <q-tab-panels v-model="tab" animated>
-      <q-tab-panel name="add">
-        <!-- <draggable item-key="id" :list="sourceFields" :clone="createField" :options="sourceOptions" :sort="false">
-          <template #item="{ element }">
-            <div class="source-field" v-for="(sourceField, idx) in sourceFields" :key="idx">
-              {{ element }}
-              <q-btn type="button" size="12px" dense align="left" class="btn-fixed-width"
-                @click="onAddFieldClick(sourceField.type)" :icon="sourceField.icon" :label="sourceField.label"
-                v-if="sourceField.type !== ''" />
-            </div>
-          </template>
-        </draggable> -->
-        <draggable item-key="id" v-model="sourceFields" :clone="createField" :options="sourceOptions" :sort="false">
-          <template #item="{ element }">
-            <div class="source-field">
-              <q-btn type="button" size="12px" dense align="left" class="btn-fixed-width"
-                @click="onAddFieldClick(element.type)" :icon="element.icon" :label="element.label"
-                v-if="element.type !== ''" />
+    <template v-slot:after>
+      <draggable item-key="id" v-model="fields" @change="onChange" :options="destinationOptions" 
+          :class="{ 'q-form-builder-elements-container': true, 'empty': fields.length == 0 }" group="elements">
+          <template #item="{ element, index }">
+            <div class="editable-element-container">
+              <editable-element :vmValue="element" @my-click="selectForEdit"
+                :class="{ 'selected': isSelectedForEdit(index) }" :ref="element.cid" />
+              <div class="editable-element-action-buttons">
+                <q-btn class="editable-element-button" v-if="isSelectedForEdit(index)" @click="deleteField(index)"
+                  color="red" icon="delete" round size="xs">
+                  <q-tooltip>Delete this field</q-tooltip>
+                </q-btn>
+                <q-btn class="editable-element-button" v-if="isSelectedForEdit(index)" @click="duplicateField(index)"
+                  color="secondary" icon="file_copy" round size="xs">
+                  <q-tooltip>Duplicate this field</q-tooltip>
+                </q-btn>
+              </div>
             </div>
           </template>
         </draggable>
-      </q-tab-panel>
-      <q-tab-panel name="edit">
-        <editable-element-options :vmValue="currentField" :type-info="sourceFields" />
-      </q-tab-panel>
-    </q-tab-panels>
-
-    <draggable item-key="id" v-model="fields" @change="onChange" :options="destinationOptions"
-      :class="{ 'q-form-builder-elements-container': true, 'empty': fields.length == 0 }">
-      <template #item="{ element, index }">
-        <div class="editable-element-container">
-          <editable-element :vmValue="element" @my-click="selectForEdit"
-            :class="{ 'selected': isSelectedForEdit(index) }" :ref="element.cid" />
-          <div class="editable-element-action-buttons">
-            <q-btn class="editable-element-button" v-if="isSelectedForEdit(index)" @click="deleteField(index)"
-              color="red" icon="delete" round size="xs">
-              <q-tooltip>Delete this field</q-tooltip>
-            </q-btn>
-            <q-btn class="editable-element-button" v-if="isSelectedForEdit(index)" @click="duplicateField(index)"
-              color="secondary" icon="file_copy" round size="xs">
-              <q-tooltip>Duplicate this field</q-tooltip>
-            </q-btn>
-          </div>
-        </div>
-      </template>
-    </draggable>
-
-    <!-- <draggable item-key="id" v-model="fields" @change="onChange" :options="destinationOptions"
-      :class="{ 'q-form-builder-elements-container': true, 'empty': fields.length == 0 }">
-      <template #item="{ element, index }"> -->
-    <!-- <div>
-          {{element}}
-          {{index}}
-          <editable-element/>
-        </div> -->
-    <!-- <div class="editable-element-container" v-for="(field, idx) in fields" :key="idx">
-          {{ element }}
-          <editable-element v-model="fields[idx]" @click="selectForEdit" :class="{ 'selected': isSelectedForEdit(idx) }"
-          :ref="fields[idx].cid" />
-          <div class="editable-element-action-buttons">
-            <q-btn class="editable-element-button" v-if="isSelectedForEdit(idx)" @click="deleteField(idx)" color="red"
-              icon="delete" round size="xs">
-              <q-tooltip>Delete this field</q-tooltip>
-            </q-btn>
-            <q-btn class="editable-element-button" v-if="isSelectedForEdit(idx)" @click="duplicateField(idx)"
-              color="secondary" icon="file_copy" round size="xs">
-              <q-tooltip>Duplicate this field</q-tooltip>
-            </q-btn>
-          </div>
-        </div>
-        <div class="editable-element-container">
-          {{ element }}
-          <editable-element v-model="fields[index]" @click="selectForEdit" :class="{ 'selected': isSelectedForEdit(index) }"
-          :ref="fields[index].cid" />
-          
-        </div> -->
-    <!-- </template>
-    </draggable> -->
-
-  </div>
+    </template>
+  </q-splitter>
 </template>
 
 <script>
@@ -154,7 +115,8 @@ export default {
         { type: '' },
         { type: 'section_break', icon: 'view_agenda', label: 'Section Break' },
         { type: 'page_break', icon: 'call_to_action', label: 'Page Break' }
-      ]
+      ],
+      splitterModel: 50
     }
   },
   props: {
@@ -229,7 +191,11 @@ export default {
       console.log('onChange')
       console.log(evt)
       if (evt.added) {
-        this.selectForEdit(evt.added.element)
+        // this.selectForEdit(evt.added.element)
+        const type = evt.added.element.field_type
+        const field = this.createField({ type })
+      this.fields.push(field)
+      this.selectForEdit(field)
       }
     },
     onAddFieldClick(type) {
