@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, reactive } from 'vue';
 import types from './mutation-types';
+import { uid } from 'quasar'
 
 export const useStore = defineStore('main', {
   state: () => ({
@@ -12,6 +13,7 @@ export const useStore = defineStore('main', {
     selected_cp: {},
     activeRectId: null,
     rect:  {
+      'id': uid(),
       'width': 200,
       'height': 'auto',
       'top': 10,
@@ -67,7 +69,16 @@ export const useStore = defineStore('main', {
       this.counter++;
     },
     addRect(){
-      this.rects.push(this.rect)
+      const newRect = JSON.parse(JSON.stringify(this.rect))
+      newRect.id = uid()
+      this.rects.push(newRect)
+    },
+    deleteRect(id){
+      console.log('deleteRect')
+      if (!id) {
+        id = this.activeRectId
+      }
+      this.rects.splice(id, 1)
     },
     add_cps(id: string | number) {
       this.cps[id] = {

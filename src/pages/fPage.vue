@@ -18,23 +18,17 @@
                 :contentClass="rect.class" :stickSize="rect.stickSize" v-on:activated="activateEv(index)"
                 v-on:deactivated="deactivateEv(index)" v-on:dragging="changeDimensions($event, index)"
                 v-on:resizing="changeDimensions($event, index)" dragHandle=".drag" :preventActiveBehavior="false">
-                <!-- <div style="height: 20px; background-color: red; position: absolute; width: 100%; top: -20px; cursor: move;"
-                    class="drag">
-                   
-                    <q-bar dense class="bg-black text-white drag">
-                        <q-space />
-                        <q-icon name="battery_full" />
-                    </q-bar>
-                </div> -->
-
-
 
                 <q-bar dense class="bg-black text-white drag "
                     style="height: 20px; background-color: red; position: absolute; width: 100%; top: -20px; cursor: move;">
                     <q-space />
-                    <q-icon name="battery_full">
+                    <q-icon name="delete">
                         <q-menu touch-position>
-                            <element-list-component></element-list-component>
+                            <q-list style="min-width: 100px" dense>
+                                <q-item clickable v-close-popup @click="deleteRect">
+                                    <q-item-section class="text-red">delete ok?</q-item-section>
+                                </q-item>
+                            </q-list>
                         </q-menu>
                     </q-icon>
                 </q-bar>
@@ -319,8 +313,14 @@ export default {
             store.addRect()
         }
 
+        const deleteRect = function () {
+            console.log('deleteRect')
+            store.deleteRect()
+        }
+
         return {
             addRect,
+            deleteRect,
             clicked,
             vuedraggable_start,
             vuedraggable_end,
