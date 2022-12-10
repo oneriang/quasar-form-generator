@@ -3,15 +3,40 @@ import { ref, reactive } from 'vue';
 import types from './mutation-types';
 import { uid } from 'quasar'
 
+interface ElementObject {
+  // key に string、value も string が返る
+  [key: string]: any;
+}
+
+interface RectsObject {
+  // key に string、value も string が返る
+  [key: string]: any;
+}
+
+interface payload { 
+  id: string,
+  zIndex?: number,
+  height?: number,
+  width?: number,
+  top?: number,
+  left?: number,
+  minh?: number,
+  minw?: number,
+  gridX?: number,
+  gridY?: number,
+  stickSize?: number
+} 
+
 export const useStore = defineStore('main', {
   state: () => ({
     counter: 0,
     cps: {},
-    elements: {},
-    list: ref([]),
+    elementList: <ElementObject>{},
+    // list: ref([]),
     list3: ref([]),
     selected_cp: {},
-    activeRectId: null,
+    activeRectId: '',
+    activeElement: {},
     rect:  {
       'id': uid(),
       'width': 200,
@@ -29,28 +54,10 @@ export const useStore = defineStore('main', {
       'zIndex': 1,
       'color': '#EF9A9A',
       'active': false,
-      'stickSize': 8
+      'stickSize': 8,
+      elementList:[]
     },
-    rects: [
-      // {
-      //   'width': 200,
-      //   'height': 'auto',
-      //   'top': 10,
-      //   'left': 10,
-      //   'draggable': true,
-      //   'resizable': true,
-      //   'minw': 10,
-      //   'minh': 100,
-      //   'axis': 'both',
-      //   'parentLim': true,
-      //   'snapToGrid': false,
-      //   'aspectRatio': false,
-      //   'zIndex': 1,
-      //   'color': '#EF9A9A',
-      //   'active': false,
-      //   'stickSize': 8
-      // }
-    ],
+    rects: <RectsObject>{},
     gridX: 50,
     gridY: 50,
     verticalGridLinesCount: 0,
@@ -68,17 +75,32 @@ export const useStore = defineStore('main', {
     increment() {
       this.counter++;
     },
+    setActiveElement(element){
+      if (this.activeElement) {
+        this.activeElement.active = false        
+      }
+      element.active = true
+      this.activeElement = element
+    },
     addRect(){
       const newRect = JSON.parse(JSON.stringify(this.rect))
       newRect.id = uid()
-      this.rects.push(newRect)
+      this.rects[newRect.id] = newRect
+      this.elementList[newRect.id] = {}
     },
-    deleteRect(id){
+    deleteRect(id: string){
       console.log('deleteRect')
       if (!id) {
         id = this.activeRectId
       }
-      this.rects.splice(id, 1)
+      delete this.rects[id]
+      this.activeRectId = ''
+    },
+    deleteElement(element){
+      console.log('deleteElement')
+      console.log(element)
+      const idx = this.rects[this.activeRectId].elementList.indexOf(element) 
+      this.rects[this.activeRectId].elementList.splice(idx, 1)
     },
     add_cps(id: string | number) {
       this.cps[id] = {
@@ -142,15 +164,15 @@ export const useStore = defineStore('main', {
         // onClick:(e: any)=>{alert(1)}
       }
       console.log(this.cps)
-      this.elements[id] = null
+      // this.elements[id] = null
     },
-    setActive( { id } ) {
-      if (this.activeRectId !== null) {
+    setActive(id: string) {
+      if (this.activeRectId !== '') {
         this.disableActive(this.activeRectId)
       }
       this.enableActive(id)
     },
-    unsetActive({ id }) {
+    unsetActive(id: string) {
       this.disableActive(id)
     },
     toggleDraggable() {
@@ -230,28 +252,28 @@ export const useStore = defineStore('main', {
         this.disableAspect(id)
       }
     },
-    setWidth(width) {
+    setWidth(width: number) {
       const id = this.activeRectId;
       if (id === null) {
         return;
       }
       this.changeWidth({ id, width })
     },
-    setHeight(height) {
+    setHeight(height: number) {
       const id = this.activeRectId;
       if (id === null) {
         return;
       }
       this.changeHeight({ id, height })
     },
-    setTop(top) {
+    setTop(top: number) {
       const id = this.activeRectId;
       if (id === null) {
         return;
       }
       this.changeTop({ id, top })
     },
-    setLeft(left) {
+    setLeft(left: number) {
       const id = this.activeRectId;
       if (id === null) {
         return;
@@ -310,12 +332,24 @@ export const useStore = defineStore('main', {
 
       this.changeZindex({ id, zIndex: 1 })
 
-      for (let i = 0, l = state.rects.length; i < l; i++) {
-        if (i !== id) {
-          if (state.rects[i].zIndex === state.rects.length) {
-            continue;
+      // for (let i = 0, l = state.rects.length; i < l; i++) {
+      //   if (i !== id) {
+      //     if (state.rects[i].zIndex === state.rects.length) {
+      //       continue;
+      //     }
+      //     this.changeZindex({ id: i, zIndex: this.rects[i].zIndex + 1 })
+      //   }
+      // }
+      const len = Object.keys(this.rects).length
+      for (const key in this.rects) {
+        if (Object.prototype.hasOwnProperty.call(this.rects, key)) {
+          const el = this.rects[key]
+          if (key !== id) {
+            if (el.zIndex === len) {
+              continue
+            }
+            this.changeZindex({ id: key, zIndex: el.zIndex + 1 } )
           }
-          this.changeZindex({ id: i, zIndex: this.rects[i].zIndex + 1 })
         }
       }
     },
@@ -328,39 +362,51 @@ export const useStore = defineStore('main', {
         return;
       }
 
-      this.changeZindex({ id, zIndex: state.rects.length })
+      this.changeZindex({ id, zIndex: this.rects.length })
 
-      for (let i = 0, l = this.rects.length; i < l; i++) {
-        if (i !== id) {
-          if (this.rects[i].zIndex === 1) {
-            continue;
+      // for (let i = 0, l = this.rects.length; i < l; i++) {
+      //   if (i !== id) {
+      //     if (this.rects[i].zIndex === 1) {
+      //       continue;
+      //     }
+      //     this.changeZindex({ id: i, zIndex: this.rects[i].zIndex - 1 })
+      //   }
+      // }
+      const len = Object.keys(this.rects).length
+      for (const key in this.rects) {
+        if (Object.prototype.hasOwnProperty.call(this.rects, key)) {
+          const el = this.rects[key]
+          if (key !== id) {
+            if (el.zIndex === 1) {
+              continue
+            }
+            this.changeZindex({ id: key, zIndex: el.zIndex + 1 } )
           }
-          this.changeZindex({ id: i, zIndex: this.rects[i].zIndex - 1 })
         }
       }
     },
-    setMinWidth(width) {
+    setMinWidth(width: number) {
       const id = this.activeRectId;
       if (id === null) {
         return;
       }
       this.changeMinw({ id, minw: width })
     },
-    setMinHeight(height) {
+    setMinHeight(height: number) {
       const id = this.activeRectId;
       if (id === null) {
         return;
       }
       this.changeMinh({ id, minh: height })
     },
-    setGridX(gridX) {
+    setGridX(gridX: number) {
       const id = this.activeRectId;
       if (id === null) {
         return;
       }
       this.changeGridX({ id, gridX })
     },
-    setGridY(gridY) {
+    setGridY(gridY: number) {
       const id = this.activeRectId;
       if (id === null) {
         return;
@@ -374,88 +420,88 @@ export const useStore = defineStore('main', {
       }
       this.changeStickSize({ id, stickSize })
     },
-    enableActive(id) {
+    enableActive(id: string) {
       this.activeRectId = id;
       this.rects[id].active = true;
       this.rects[id].zIndex = 10;
     },
-    disableActive(id) {
+    disableActive(id: string) {
       if (id === this.activeRectId) {
-        this.activeRectId = null;
+        this.activeRectId = '';
       }
       this.rects[id].active = false;
       this.rects[id].zIndex = 1;
     },
-    enableAspect(id) {
+    enableAspect(id: string) {
       this.rects[id].aspectRatio = true;
     },
-    disableAspect(id) {
+    disableAspect(id: string) {
       this.rects[id].aspectRatio = false;
     },
-    enableDraggable(id) {
+    enableDraggable(id: string) {
       this.rects[id].draggable = true;
     },
-    disableDraggable(id) {
+    disableDraggable(id: string) {
       this.rects[id].draggable = false;
     },
-    enableResizable(id) {
+    enableResizable(id: string) {
       this.rects[id].resizable = true;
     },
-    disableResizable(id) {
+    disableResizable(id: string) {
       this.rects[id].resizable = false;
     },
-    enableSnapToGrid(id) {
+    enableSnapToGrid(id: string) {
       this.rects[id].snapToGrid = true;
     },
-    disableSnapToGrid(id) {
+    disableSnapToGrid(id: string) {
       this.rects[id].snapToGrid = false;
     },
-    enableBothAxis(id) {
+    enableBothAxis(id: string) {
       this.rects[id].axis = 'both';
     },
-    enableNoneAxis(id) {
+    enableNoneAxis(id: string) {
       this.rects[id].axis = 'none';
     },
-    enableXAxis(id) {
+    enableXAxis(id: string) {
       this.rects[id].axis = 'x';
     },
-    enableYAxis(id) {
+    enableYAxis(id: string) {
       this.rects[id].axis = 'y';
     },
-    enableParentLimitation(id) {
+    enableParentLimitation(id: string) {
       this.rects[id].parentLim = true;
     },
-    disableParentLimitation(id) {
+    disableParentLimitation(id: string) {
       this.rects[id].parentLim = false;
     },
-    changeZindex(payload) {
+    changeZindex(payload: payload) {
       this.rects[payload.id].zIndex = payload.zIndex;
     },
-    changeHeight(payload) {
+    changeHeight(payload: payload) {
       this.rects[payload.id].height = payload.height;
     },
-    changeWidth(payload) {
+    changeWidth(payload: payload) {
       this.rects[payload.id].width = payload.width;
     },
-    changeTop(payload) {
+    changeTop(payload: payload) {
       this.rects[payload.id].top = payload.top;
     },
-    changeLeft(payload) {
+    changeLeft(payload: payload) {
       this.rects[payload.id].left = payload.left;
     },
-    changeMinh(payload) {
+    changeMinh(payload: payload) {
       this.rects[payload.id].minh = payload.minh;
     },
-    changeMinw(payload) {
+    changeMinw(payload: payload) {
       this.rects[payload.id].minw = payload.minw;
     },
-    changeGridX(payload) {
+    changeGridX(payload: payload) {
       this.rects[payload.id].gridX = payload.gridX;
     },
-    changeGridY(payload) {
+    changeGridY(payload: payload) {
       this.rects[payload.id].gridY = payload.gridY;
     },
-    changeStickSize(payload) {
+    changeStickSize(payload: payload) {
       this.rects[payload.id].stickSize = payload.stickSize;
     },
   },

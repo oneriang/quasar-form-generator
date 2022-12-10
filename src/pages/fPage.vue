@@ -10,19 +10,19 @@
                     </q-item>
                 </q-list>
             </q-menu>
-            <VueDragResize v-for="(rect, index) in rects" :key="index" :w="rect.width" :h="rect.height" :x="rect.left"
-                :y="rect.top" :parentW="wrapperSize.width" :parentH="wrapperSize.height" :axis="rect.axis"
-                :isActive="rect.active" :minw="rect.minw" :minh="rect.minh" :isDraggable="rect.draggable"
-                :isResizable="rect.resizable" :parentLimitation="rect.parentLim" :snapToGrid="rect.snapToGrid"
-                :gridX="gridX" :gridY="gridY" :aspectRatio="rect.aspectRatio" :z="rect.zIndex"
-                :contentClass="rect.class" :stickSize="rect.stickSize" v-on:activated="activateEv(index)"
-                v-on:deactivated="deactivateEv(index)" v-on:dragging="changeDimensions($event, index)"
-                v-on:resizing="changeDimensions($event, index)" dragHandle=".drag" :preventActiveBehavior="false">
+            <VueDragResize v-for="(rect, id, index) in rects" :key="index" :w="rect.width" :h="rect.height"
+                :x="rect.left" :y="rect.top" :parentW="wrapperSize.width" :parentH="wrapperSize.height"
+                :axis="rect.axis" :isActive="rect.active" :minw="rect.minw" :minh="rect.minh"
+                :isDraggable="rect.draggable" :isResizable="rect.resizable" :parentLimitation="rect.parentLim"
+                :snapToGrid="rect.snapToGrid" :gridX="gridX" :gridY="gridY" :aspectRatio="rect.aspectRatio"
+                :z="rect.zIndex" :contentClass="rect.class" :stickSize="rect.stickSize" v-on:activated="activateEv(id)"
+                v-on:deactivated="deactivateEv(id)" v-on:dragging="changeDimensions($event, id)"
+                v-on:resizing="changeDimensions($event, id)" dragHandle=".drag" :preventActiveBehavior="false">
 
                 <q-bar dense class="bg-black text-white drag "
                     style="height: 20px; background-color: red; position: absolute; width: 100%; top: -20px; cursor: move;">
                     <q-space />
-                    <q-icon name="delete">
+                    <q-icon name="delete" style="cursor: pointer">
                         <q-menu touch-position>
                             <q-list style="min-width: 100px" dense>
                                 <q-item clickable v-close-popup @click="deleteRect">
@@ -36,12 +36,25 @@
                     <q-menu touch-position context-menu @mousedown.stop>
                         <element-list-component></element-list-component>
                     </q-menu>
-                    <vuedraggable class="dragArea list-group" :list="list" group="people1" @change="change"
+                    <vuedraggable class="dragArea list-group" :list="rect.elementList" group="people1" @change="change"
                         item-key="id"
                         style="background-color: aquamarine; min-height: 100px; padding: 5px; height:100%;"
                         @start="vuedraggable_start" @end="vuedraggable_end">
                         <template #item="{ element }">
-                            <div class="list-group-item" @click="clicked(element)">
+                            <div class="list-group-item" :class="`${element.active ? 'active' : 'inactive'} `" @click="clicked(element)">
+                                <q-bar dense class="text-black element-bar"
+                                    style="height: 20px; background-color: lightgoldenrodyellow; width: 100%; top: -20px; cursor: move;">
+                                    <q-space />
+                                    <q-icon name="delete" style="cursor: pointer">
+                                        <q-menu touch-position>
+                                            <q-list style="min-width: 100px" dense>
+                                                <q-item clickable v-close-popup @click="deleteElement(element)">
+                                                    <q-item-section class="text-red">delete ok?</q-item-section>
+                                                </q-item>
+                                            </q-list>
+                                        </q-menu>
+                                    </q-icon>
+                                </q-bar>
                                 <component v-bind:is="element.type" v-model="cps[element.ref].modelValue"
                                     v-bind="cps[element.ref]" :style="'color:' + cps[element.ref]['color']"
                                     :ref="el => { elements[element.ref] = el }">
@@ -180,6 +193,36 @@ body {
 .vdr.inactive .vdr-stick {
     display: none;
 } */
+
+
+.element-bar {
+    display: none;
+    border: none;
+}
+
+.list-group-item.inactive {
+    border: none;
+}
+
+.list-group-item.active {
+    border-style: solid;
+    border-width: thin;
+    border-color: lightgray;
+}
+
+.list-group-item:hover {
+    border-style: solid;
+    border-width: thin;
+    border-color: lightgray;
+}
+
+.list-group-item.active .element-bar {
+    display: flex;
+}
+.list-group-item:hover .element-bar {
+    display: flex;
+}
+
 </style>
 
 <script>
@@ -241,14 +284,14 @@ export default {
             // store.setHeight('');
         };
 
-        const activateEv = (index) => {
+        const activateEv = (id) => {
             console.log('activateEv')
-            store.setActive({ id: index });
+            store.setActive(id);
         };
 
-        const deactivateEv = (index) => {
+        const deactivateEv = (id) => {
             console.log('deactivateEv')
-            store.unsetActive({ id: index });
+            store.unsetActive(id);
         };
 
         const changeWrapperSize = () => {
@@ -288,6 +331,7 @@ export default {
             console.log('clicked')
             console.log(element)
             console.log(elements.value)
+            store.setActiveElement(element)
             // list3.value = Object.entries(elements.value[element.ref])
             store.list3 = Object.entries(elements.value[element.ref])
             // selected_cp.value = element
@@ -318,9 +362,15 @@ export default {
             store.deleteRect()
         }
 
+        const deleteElement = function (element) {
+            console.log('deleteElement')
+            store.deleteElement(element)
+        }
+
         return {
             addRect,
             deleteRect,
+            deleteElement,
             clicked,
             vuedraggable_start,
             vuedraggable_end,

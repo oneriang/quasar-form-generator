@@ -29,16 +29,16 @@ const { list, cps} = storeToRefs(store);
 import { uid } from 'quasar'
 
 const list1 = [
-  { name: 'QInput', id: 1, type: 'q-input', ref: 'qInput' },
-  { name: 'QBtn', id: 2, type: 'q-btn', ref: 'qBtn' },
-  { name: 'QSelect', id: 3, type: 'q-select', ref: 'qSelect' },
-  { name: 'QRadio', id: 4, type: 'q-radio', ref: 'qRadio' },
-  { name: 'QSlider', id: 5, type: 'q-slider', ref: 'qSlider' },
-  { name: 'QDate', id: 6, type: 'q-date', ref: 'qDate' },
-  { name: 'QCheckbox', id: 7, type: 'q-checkbox', ref: 'qCheckbox' },
-  { name: 'QAvatar', id: 8, type: 'q-avatar', ref: 'qAvatar' },
-  { name: 'QBadge', id: 9, type: 'q-badge', ref: 'qBadge' },
-  { name: 'QCard', id: 9, type: 'q-card', ref: 'qCard' },
+  { name: 'QInput', id: 1, type: 'q-input', ref: 'qInput', active: false },
+  { name: 'QBtn', id: 2, type: 'q-btn', ref: 'qBtn', active: false },
+  { name: 'QSelect', id: 3, type: 'q-select', ref: 'qSelect', active: false },
+  { name: 'QRadio', id: 4, type: 'q-radio', ref: 'qRadio', active: false },
+  { name: 'QSlider', id: 5, type: 'q-slider', ref: 'qSlider', active: false },
+  { name: 'QDate', id: 6, type: 'q-date', ref: 'qDate', active: false },
+  { name: 'QCheckbox', id: 7, type: 'q-checkbox', ref: 'qCheckbox', active: false },
+  { name: 'QAvatar', id: 8, type: 'q-avatar', ref: 'qAvatar', active: false },
+  { name: 'QBadge', id: 9, type: 'q-badge', ref: 'qBadge', active: false },
+  { name: 'QCard', id: 9, type: 'q-card', ref: 'qCard', active: false },
 ]
 
 function click(item) {
@@ -47,7 +47,8 @@ function click(item) {
   const id = uid()
   store.add_cps(id)
   c_item.ref = id
-  list.value.push(c_item)
+  // list.value.push(c_item)
+  store.rects[store.activeRectId].elementList.push(c_item)
   // return c_item
 }
 
