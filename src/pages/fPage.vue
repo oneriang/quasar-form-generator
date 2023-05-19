@@ -1,6 +1,8 @@
 <template>
     <div id="app" class="workspace">
         <!-- <tool-bar></tool-bar> -->
+        <component v-bind:is="'q-input'">
+                                </component>
         <div class="rect-wrapper" ref="rectWrapper">
 
             <q-menu touch-position context-menu @mousedown.stop>
@@ -55,7 +57,11 @@
                                         </q-menu>
                                     </q-icon>
                                 </q-bar>
-                                <component v-bind:is="element.type" v-model="cps[element.ref].modelValue"
+                                <component v-bind:is="'q-input'">
+                                </component>
+                                <component v-bind:is="element.type">
+                                </component>
+                                <!-- <component v-bind:is="element.type" v-model="cps[element.ref].modelValue"
                                     v-bind="cps[element.ref]" :style="'color:' + cps[element.ref]['color']"
                                     :ref="el => { elements[element.ref] = el }">
                                     <template v-if="element.type === 'q-card'">
@@ -68,7 +74,7 @@
                                             abcdefg
                                         </q-card-section>
                                     </template>
-                                </component>
+                                </component> -->
                                 <!-- <component v-bind:is="element.type" v-model="cps[element.ref].modelValue"
                                     v-bind="cps[element.ref]" :style="'color:' + cps[element.ref]['color']"
                                     :ref="el => { elements[element.ref] = el }"> -->
@@ -333,7 +339,7 @@ export default {
             console.log(elements.value)
             store.setActiveElement(element)
             // list3.value = Object.entries(elements.value[element.ref])
-            store.list3 = Object.entries(elements.value[element.ref])
+            store.propertyList = Object.entries(elements.value[element.ref])
             // selected_cp.value = element
             store.selected_cp = element
         }
@@ -360,11 +366,15 @@ export default {
         const deleteRect = function () {
             console.log('deleteRect')
             store.deleteRect()
+            store.propertyList = []
+            store.selected_cp = {}
         }
 
         const deleteElement = function (element) {
             console.log('deleteElement')
             store.deleteElement(element)
+            store.propertyList = []
+            store.selected_cp = {}
         }
 
         return {

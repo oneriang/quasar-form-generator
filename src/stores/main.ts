@@ -33,7 +33,7 @@ export const useStore = defineStore('main', {
     cps: {},
     elementList: <ElementObject>{},
     // list: ref([]),
-    list3: ref([]),
+    propertyList: ref([]),
     selected_cp: {},
     activeRectId: '',
     activeElement: {},
@@ -505,4 +505,5 @@ export const useStore = defineStore('main', {
       this.rects[payload.id].stickSize = payload.stickSize;
     },
   },
+  persist: true
 });

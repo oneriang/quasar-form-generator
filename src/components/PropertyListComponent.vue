@@ -1,7 +1,7 @@
 <template>
   <div>
     <q-list dense bordered separator>
-      <q-item clickable v-ripple v-for="item in list3" :key="item.id">
+      <q-item clickable v-ripple v-for="item in propertyList" :key="item.id">
         <q-item-section>
           {{ item[0] }} : {{ typeof (item[1]) }} : {{ item[1] }}
           <template v-if="typeof (item[1]) === 'boolean'">
@@ -44,10 +44,7 @@ import { storeToRefs } from "pinia";
 import { useStore } from '../stores/main.ts'
 const store = useStore()
 
-// const list3 = ref([])
-// list3.value = store.list3
-// const list3 = storeToRefs
-const { list3, cps, selected_cp  } = storeToRefs(store);
+const { propertyList, cps, selected_cp  } = storeToRefs(store);
 // const cps = store.cps
 // const selected_cp = store.selected_cp
 const options = [

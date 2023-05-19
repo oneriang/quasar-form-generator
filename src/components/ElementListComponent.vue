@@ -38,7 +38,10 @@ const list1 = [
   { name: 'QCheckbox', id: 7, type: 'q-checkbox', ref: 'qCheckbox', active: false },
   { name: 'QAvatar', id: 8, type: 'q-avatar', ref: 'qAvatar', active: false },
   { name: 'QBadge', id: 9, type: 'q-badge', ref: 'qBadge', active: false },
-  { name: 'QCard', id: 9, type: 'q-card', ref: 'qCard', active: false },
+  { name: 'QCard', id: 10, type: 'q-card', ref: 'qCard', active: false },
+  // { name: 'QBtnToggle', id: 11, type: 'q-btn-toggle', ref: 'qBtnToggle', active: false },
+  // { name: 'QEditor', id: 10, type: 'q-editor', ref: 'qEditor', active: false },
+  { name: 'QRange', id: 10, type: 'q-range', ref: 'qRange', active: false },
 ]
 
 function click(item) {

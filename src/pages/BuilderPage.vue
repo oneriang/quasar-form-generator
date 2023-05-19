@@ -27,9 +27,10 @@
               <template #item="{ element }">
                 <div class="list-group-item" @click="clicked(element)">
                   <!-- {{ element.type }} -->
-                  <component v-bind:is="element.type" v-model="cps[element.ref].modelValue" v-bind="cps[element.ref]"
-                    :style="'color:' + cps[element.ref]['color']" :ref="el => { elements[element.ref] = el }" />
-                </div>
+                  <!-- <component v-bind:is="element.type" v-model="cps[element.ref].modelValue" v-bind="cps[element.ref]"
+                    :style="'color:' + cps[element.ref]['color']" :ref="el => { elements[element.ref] = el }" /> -->
+                    <component v-bind:is="element.type"/>
+                  </div>
               </template>
             </vuedraggable>
           </grid-item>
